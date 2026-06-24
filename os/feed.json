@@ -1,12 +1,10 @@
 {
-  "generated_at": "2026-06-24T23:07:59+08:00",
+  "generated_at": "2026-06-25T00:06:36",
   "source": {
-    "title": "工作区",
     "url": "https://my.feishu.cn/wiki/ELCQwN0p7ihY2qkrsOJcmC1knCZ"
   },
   "groups": [
     {
-      "level": 1,
       "heading": "营销基础",
       "docs": [
         {
@@ -16,7 +14,6 @@
       ]
     },
     {
-      "level": 1,
       "heading": "出海营销基础",
       "docs": [
         {
@@ -34,13 +31,17 @@
       ]
     },
     {
-      "level": 1,
       "heading": "思考",
       "docs": [
         {
           "title": "二六年六月份中旬，关于下一步要做什么的判断？",
           "url": "https://my.feishu.cn/wiki/CgRrwYiU0ik9DvkGNrYcUV6fnvg"
-        },
+        }
+      ]
+    },
+    {
+      "heading": "英语",
+      "docs": [
         {
           "title": "糖说英语",
           "url": "https://my.feishu.cn/wiki/GFknwkhbiiUYXtkQpcMc1EYxnqV"
