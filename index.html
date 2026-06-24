@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>王予晟 · Portfolio</title>
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --accent: #c8a96e;
+    --accent2: #7eb8c8;
+    --text: #e8e8e8;
+    --muted: #666;
+    --font: 'PingFang SC', 'SF Pro Text', -apple-system, sans-serif;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 100;
+    padding: 20px 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(10,10,10,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo { font-size: 14px; letter-spacing: 4px; color: var(--accent); text-transform: uppercase; }
+  nav ul { list-style: none; display: flex; gap: 40px; }
+  nav a { color: var(--muted); text-decoration: none; font-size: 13px; letter-spacing: 1px; transition: color .2s; }
+  nav a:hover { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 120px 60px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(200,169,110,0.06) 0%, transparent 70%);
+  }
+  .hero-content { max-width: 760px; }
+  .hero-tag {
+    display: inline-block;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--accent); border: 1px solid rgba(200,169,110,0.3);
+    padding: 6px 16px; border-radius: 2px; margin-bottom: 32px;
+  }
+  .hero h1 {
+    font-size: clamp(48px, 7vw, 96px);
+    font-weight: 300; letter-spacing: -2px; line-height: 1.05;
+    margin-bottom: 12px;
+  }
+  .hero h1 em {
+    font-style: normal; color: var(--accent);
+  }
+  .hero-en {
+    font-size: 16px; letter-spacing: 6px; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 32px;
+  }
+  .hero-desc {
+    font-size: 16px; color: #888; max-width: 520px; line-height: 1.8;
+    margin-bottom: 48px;
+  }
+  .hero-actions { display: flex; gap: 20px; align-items: center; }
+  .btn {
+    padding: 14px 32px; font-size: 13px; letter-spacing: 1px;
+    cursor: pointer; text-decoration: none; display: inline-block;
+    transition: all .25s;
+  }
+  .btn-primary {
+    background: var(--accent); color: #0a0a0a;
+    border: 1px solid var(--accent);
+  }
+  .btn-primary:hover { background: #d4b87a; }
+  .btn-ghost {
+    background: transparent; color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--muted); }
+
+  .hero-numbers {
+    position: absolute; right: 60px; bottom: 80px;
+    display: flex; gap: 60px;
+  }
+  .num-item { text-align: right; }
+  .num-item .n { font-size: 36px; font-weight: 200; color: var(--accent); letter-spacing: -1px; }
+  .num-item .l { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-top: 4px; }
+
+  /* SECTION BASE */
+  section { padding: 100px 60px; }
+  .section-label {
+    font-size: 11px; letter-spacing: 4px; color: var(--accent);
+    text-transform: uppercase; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .section-label::after {
+    content: ''; flex: 1; max-width: 40px;
+    height: 1px; background: var(--accent); opacity: .4;
+  }
+  .section-title {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 300; letter-spacing: -1px; margin-bottom: 60px;
+  }
+
+  /* ABOUT */
+  .about { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .about-text p { color: #888; font-size: 15px; margin-bottom: 20px; }
+  .about-text strong { color: var(--text); }
+  .about-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 32px; }
+  .tag {
+    font-size: 12px; letter-spacing: 1px;
+    padding: 8px 16px; border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .about-side .kv { border-top: 1px solid var(--border); padding: 20px 0; }
+  .about-side .kv:last-child { border-bottom: 1px solid var(--border); }
+  .about-side .kv-label { font-size: 11px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
+  .about-side .kv-value { font-size: 15px; color: var(--text); }
+
+  /* AWARDS */
+  .awards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+  .award-card {
+    background: var(--surface); padding: 40px;
+    border: 1px solid var(--border); position: relative;
+    transition: border-color .25s;
+  }
+  .award-card:hover { border-color: rgba(200,169,110,0.3); }
+  .award-icon { font-size: 28px; margin-bottom: 20px; }
+  .award-org { font-size: 11px; letter-spacing: 2px; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; }
+  .award-name { font-size: 18px; font-weight: 400; margin-bottom: 8px; }
+  .award-desc { font-size: 14px; color: var(--muted); line-height: 1.6; }
+  .award-badge {
+    position: absolute; top: 24px; right: 24px;
+    font-size: 11px; padding: 4px 10px; letter-spacing: 1px;
+    background: rgba(200,169,110,0.1); color: var(--accent);
+    border: 1px solid rgba(200,169,110,0.2);
+  }
+
+  /* SKILLS */
+  .skills { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .skills-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .skill-group-title { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  .skill-item { padding: 16px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .skill-item:last-child { border-bottom: none; }
+  .skill-name { font-size: 14px; color: var(--text); }
+  .skill-bar { width: 60px; height: 2px; background: var(--border); position: relative; }
+  .skill-fill { position: absolute; left: 0; top: 0; height: 100%; background: var(--accent); }
+
+  /* VISION */
+  .vision-timeline { position: relative; }
+  .vision-timeline::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 1px; background: var(--border);
+  }
+  .timeline-item { padding-left: 48px; padding-bottom: 56px; position: relative; }
+  .timeline-item:last-child { padding-bottom: 0; }
+  .timeline-dot {
+    position: absolute; left: -6px; top: 4px;
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--bg);
+  }
+  .timeline-dot.active { border-color: var(--accent); background: var(--accent); box-shadow: 0 0 16px rgba(200,169,110,0.3); }
+  .timeline-year { font-size: 12px; letter-spacing: 3px; color: var(--accent); margin-bottom: 8px; }
+  .timeline-title { font-size: 20px; font-weight: 400; margin-bottom: 8px; }
+  .timeline-desc { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 480px; }
+
+  /* CONTACT */
+  .contact { text-align: center; }
+  .contact .section-label { justify-content: center; }
+  .contact .section-label::after { display: none; }
+  .contact-desc { color: var(--muted); margin: 0 auto 48px; max-width: 440px; font-size: 15px; }
+  .contact-links { display: flex; justify-content: center; gap: 32px; }
+  .contact-link { color: var(--muted); text-decoration: none; font-size: 13px; letter-spacing: 1px; transition: color .2s; }
+  .contact-link:hover { color: var(--accent); }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 60px; border-top: 1px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  footer span { font-size: 12px; color: var(--muted); letter-spacing: 1px; }
+
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    nav ul { display: none; }
+    .hero { padding: 100px 24px 60px; }
+    .hero-numbers { display: none; }
+    section { padding: 60px 24px; }
+    .about-grid, .awards-grid, .skills-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">YW</div>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#awards">Awards</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#vision">Vision</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-tag">Portfolio · 2026</div>
+    <h1>王<em>予晟</em></h1>
+    <p class="hero-en">Yusheng Wang</p>
+    <p class="hero-desc">
+      PMM / GTM Strategy · Design × Tech × Business<br>
+      从设计到商业，从竞赛到市场，寻找能把想法变成真实商业结果的路径。
+    </p>
+    <div class="hero-actions">
+      <a href="#awards" class="btn btn-primary">查看成就</a>
+      <a href="#contact" class="btn btn-ghost">联系我</a>
+    </div>
+  </div>
+  <div class="hero-numbers">
+    <div class="num-item">
+      <div class="n">985</div>
+      <div class="l">大学背景</div>
+    </div>
+    <div class="num-item">
+      <div class="n">4+</div>
+      <div class="l">国家级奖项</div>
+    </div>
+    <div class="num-item">
+      <div class="n">10+</div>
+      <div class="l">国际展览</div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="section-label">About</div>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>
+        <strong>视觉传达设计本科（985）</strong>，但核心竞争力从来不只是设计。
+        大一起加入计算机学院智能交互实验室，以产品经理身份参与竞赛，
+        拿到苹果移动应用创新赛与腾讯高校游戏设计大赛各两届全国奖项。
+      </p>
+      <p>
+        艺术海报在俄罗斯、墨西哥、迪拜等多个国家和地区展出，入选世界五大海报展之一——
+        这是兴趣，不是主业。
+      </p>
+      <p>
+        真正感兴趣的是：<strong>从市场需求洞察，到 GTM 路径，到 PMF 验证</strong>——
+        那些能直接决定商业结果的事。目标是在 2026—2031 年积累商业认知与原始资本，
+        2031—2036 年联合创业，以现金流实现财富自由。
+      </p>
+      <div class="about-tags">
+        <span class="tag">PMM / GTM</span>
+        <span class="tag">HCI · 人机交互</span>
+        <span class="tag">智能硬件</span>
+        <span class="tag">消费电子</span>
+        <span class="tag">品牌策略</span>
+        <span class="tag">产品定位</span>
+      </div>
+    </div>
+    <div class="about-side">
+      <div class="kv">
+        <div class="kv-label">教育背景</div>
+        <div class="kv-value">985 · 视觉传达设计本科<br><span style="color:var(--muted);font-size:13px">人机交互微专业</span></div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">核心角色</div>
+        <div class="kv-value">PMM · GTM · 产品策略</div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">35岁目标</div>
+        <div class="kv-value">3,000万 · 财富自由</div>
+      </div>
+      <div class="kv">
+        <div class="kv-label">城市</div>
+        <div class="kv-value">一切为搞钱，不在意城市</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AWARDS -->
+<section id="awards">
+  <div class="section-label">Awards & Exhibitions</div>
+  <h2 class="section-title">成就与认可</h2>
+  <div class="awards-grid">
+    <div class="award-card">
+      <div class="award-icon">🍎</div>
+      <div class="award-org">Apple</div>
+      <div class="award-name">移动应用创新赛</div>
+      <div class="award-desc">连续两届全国奖项，担任产品经理与项目负责人，主导从产品定义到设计的完整链路。</div>
+      <div class="award-badge">× 2 届</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">🎮</div>
+      <div class="award-org">Tencent</div>
+      <div class="award-name">高校游戏设计大赛</div>
+      <div class="award-desc">连续两届全国奖项，参与策划、交互与产品设计，覆盖从创意提案到原型落地的核心节点。</div>
+      <div class="award-badge">× 2 届</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">🌍</div>
+      <div class="award-org">International</div>
+      <div class="award-name">国际海报展览</div>
+      <div class="award-desc">作品在俄罗斯、墨西哥、迪拜等多个国家和地区展出，入选世界五大海报展之一，并获英镑、俄罗斯卢布等奖金。</div>
+      <div class="award-badge">10+ 展出</div>
+    </div>
+    <div class="award-card">
+      <div class="award-icon">⚙️</div>
+      <div class="award-org">HCI Lab</div>
+      <div class="award-name">智能可穿戴设备</div>
+      <div class="award-desc">户外安全可穿戴设备、个人健康设备概念项目，使用 Arduino 完成原型，交互艺术装置等多个方向探索。</div>
+      <div class="award-badge">概念项目</div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="skills" id="skills">
+  <div class="section-label">Capabilities</div>
+  <h2 class="section-title">能力栈</h2>
+  <div class="skills-grid">
+    <div>
+      <div class="skill-group-title">Business</div>
+      <div class="skill-item"><span class="skill-name">GTM Strategy</span><div class="skill-bar"><div class="skill-fill" style="width:80%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">Market Positioning</span><div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">PMF 验证思维</span><div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">商业模式构建</span><div class="skill-bar"><div class="skill-fill" style="width:70%"></div></div></div>
+    </div>
+    <div>
+      <div class="skill-group-title">Design & Product</div>
+      <div class="skill-item"><span class="skill-name">视觉传达设计</span><div class="skill-bar"><div class="skill-fill" style="width:92%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">人机交互 / UX</span><div class="skill-bar"><div class="skill-fill" style="width:80%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">产品策略定义</span><div class="skill-bar"><div class="skill-fill" style="width:75%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">品牌叙事</span><div class="skill-bar"><div class="skill-fill" style="width:78%"></div></div></div>
+    </div>
+    <div>
+      <div class="skill-group-title">Tech & Tools</div>
+      <div class="skill-item"><span class="skill-name">Arduino / 硬件原型</span><div class="skill-bar"><div class="skill-fill" style="width:60%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">竞赛项目管理</span><div class="skill-bar"><div class="skill-fill" style="width:85%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">内容方法论（小红书）</span><div class="skill-bar"><div class="skill-fill" style="width:65%"></div></div></div>
+      <div class="skill-item"><span class="skill-name">深度思考 / 系统构建</span><div class="skill-bar"><div class="skill-fill" style="width:88%"></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- VISION -->
+<section id="vision">
+  <div class="section-label">Timeline</div>
+  <h2 class="section-title">35岁原景</h2>
+  <div class="vision-timeline">
+    <div class="timeline-item">
+      <div class="timeline-dot active"></div>
+      <div class="timeline-year">2026 · NOW</div>
+      <div class="timeline-title">起点：选赛道 · 入场</div>
+      <div class="timeline-desc">选定方向（消费电子 / AI 硬件 / DTC），加入能接触商业全链路的公司，目标岗位 PMM / GTM。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2026 — 2031</div>
+      <div class="timeline-title">打工积累期：商业能力 + 原始资本</div>
+      <div class="timeline-desc">深耕一个方向，积累商业认知、行业 know-how、市场手感与 1—2 百万原始资本。不做执行细节，专注能推动商业结果的角色。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2031 — 2036</div>
+      <div class="timeline-title">联合创业：冲刺财富自由</div>
+      <div class="timeline-desc">以联合创始人身份入场，小步试错，现金流优先。不追求 IPO，目标以现金流实现财富自由。</div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2036 · 35岁</div>
+      <div class="timeline-title">终点：3,000万 · 被动收入</div>
+      <div class="timeline-desc">资产达到 3,000万，被动收入为主，全球可移动办公，仅做决策。环游世界的同时继续构建下一个阶段。</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-label">Contact</div>
+  <h2 class="section-title" style="text-align:center">联系我</h2>
+  <p class="contact-desc">如果你在找一个能把想法推向市场的人，而不只是执行需求的人——我们可以聊聊。</p>
+  <div class="contact-links">
+    <a href="mailto:yushengw0702@gmail.com" class="contact-link">yushengw0702@gmail.com</a>
+    <a href="#" class="contact-link">小红书</a>
+    <a href="#" class="contact-link">微信</a>
+  </div>
+</section>
+
+<footer>
+  <span>© 2026 王予晟</span>
+  <span>Design × Tech × Business</span>
+  <span>目标 · 35岁 · ¥3,000万</span>
+</footer>
+
+</body>
+</html>
