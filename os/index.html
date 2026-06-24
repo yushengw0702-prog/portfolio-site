@@ -294,7 +294,7 @@
   <div class="panel">
     <div class="feed-head">
       <div class="feed-meta" id="feedMeta">读取中…</div>
-      <button class="feed-refresh" id="feedRefresh" onclick="renderFeed()">↻ 刷新</button>
+      <button class="feed-refresh" id="feedRefresh" onclick="syncFeed()">↻ 同步</button>
     </div>
     <div id="feedBox"></div>
   </div>
@@ -454,30 +454,54 @@ function renderLaunch(){
 
 /* ── 工作区收录 feed（标题=小标签，下面=内联引用文档）── */
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+// 把一份 feed 数据画到面板上
+function paintFeed(f){
+  const box=$('#feedBox');
+  const src=f.source&&f.source.url?` · <a href="${f.source.url}" target="_blank" style="color:var(--gold);text-decoration:none">打开源文档 ↗</a>`:'';
+  $('#feedMeta').innerHTML='同步于 '+(f.generated_at||'').slice(0,16).replace('T',' ')+src;
+  const groups=f.groups||[];
+  if(!groups.length){box.innerHTML='<div class="feed-empty">工作区暂无内容</div>';return}
+  box.innerHTML=groups.map((g,i)=>{
+    const docs=(g.docs&&g.docs.length)
+      ? g.docs.map(d=>{
+          const has=d.title&&d.title.trim()&&d.title!=='无标题文档';
+          return `<a class="feed-link${has?'':' untitled'}" href="${d.url}" target="_blank">${esc(d.title)}</a>`;
+        }).join('')
+      : '<div class="feed-empty">（该分类暂无文档）</div>';
+    return `<details class="feed-group" ${i<2?'open':''}>`
+         +`<summary><span class="tag">${esc(g.heading)}</span>`
+         +`<span class="cnt">${(g.docs||[]).length}</span><span class="arr">▸</span></summary>`
+         +`<div class="feed-kids">${docs}</div></details>`;
+  }).join('');
+}
+
+// 只读取静态 feed.json（页面初次加载用）
 function renderFeed(){
   const box=$('#feedBox'),btn=$('#feedRefresh');
   if(btn)btn.classList.add('spin');
-  fetch('feed.json?_='+Date.now()).then(r=>r.json()).then(f=>{
-    const src=f.source&&f.source.url?` · <a href="${f.source.url}" target="_blank" style="color:var(--gold);text-decoration:none">打开源文档 ↗</a>`:'';
-    $('#feedMeta').innerHTML='同步于 '+(f.generated_at||'').slice(0,16).replace('T',' ')+src;
-    const groups=f.groups||[];
-    if(!groups.length){box.innerHTML='<div class="feed-empty">工作区暂无内容</div>';return}
-    box.innerHTML=groups.map((g,i)=>{
-      const docs=(g.docs&&g.docs.length)
-        ? g.docs.map(d=>{
-            const has=d.title&&d.title.trim()&&d.title!=='无标题文档';
-            return `<a class="feed-link${has?'':' untitled'}" href="${d.url}" target="_blank">${esc(d.title)}</a>`;
-          }).join('')
-        : '<div class="feed-empty">（该分类暂无文档）</div>';
-      return `<details class="feed-group" ${i<2?'open':''}>`
-           +`<summary><span class="tag">${esc(g.heading)}</span>`
-           +`<span class="cnt">${(g.docs||[]).length}</span><span class="arr">▸</span></summary>`
-           +`<div class="feed-kids">${docs}</div></details>`;
-    }).join('');
-  }).catch(()=>{
-    box.innerHTML='<div class="feed-empty">暂无同步数据 —— 运行 update-feed 脚本后显示</div>';
+  fetch('feed.json?_='+Date.now()).then(r=>r.json()).then(paintFeed).catch(()=>{
+    box.innerHTML='<div class="feed-empty">暂无同步数据 —— 点「↻ 同步」从飞书拉取</div>';
     $('#feedMeta').textContent='';
   }).finally(()=>{if(btn)btn.classList.remove('spin')});
+}
+
+// 点「同步」：触发本地服务实时拉飞书 → 立即用返回的数据渲染；
+// 本地服务不可用（如在别的设备上打开）则退化为重新拉取静态 feed.json
+function syncFeed(){
+  const box=$('#feedBox'),btn=$('#feedRefresh'),meta=$('#feedMeta');
+  if(btn)btn.classList.add('spin');
+  if(meta)meta.textContent='正在从飞书同步…';
+  const ctrl=new AbortController();
+  const t=setTimeout(()=>ctrl.abort(),12000);
+  fetch('http://127.0.0.1:8787/sync?token=fp-sync-2026',{signal:ctrl.signal})
+    .then(r=>r.json())
+    .then(res=>{
+      clearTimeout(t);
+      if(res&&res.ok&&res.feed){ paintFeed(res.feed); }
+      else { renderFeed(); }
+    })
+    .catch(()=>{ clearTimeout(t); renderFeed(); })
+    .finally(()=>{if(btn)btn.classList.remove('spin')});
 }
 
 /* ── init ── */
