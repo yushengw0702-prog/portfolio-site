@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人系统 OS · 晨间控制台</title>
+<style>
+  :root{
+    --bg:#faf9f5;
+    --ink:#1c1a16;
+    --ink-soft:#4a4640;
+    --muted:#8c867b;
+    --line:#e7e1d6;
+    --card:#fffdf8;
+    --gold:#b8924f;
+    --gold-soft:#d9c49a;
+    --teal:#5a8a82;
+    --rust:#a8623f;
+    --sidebar:#1e1b16;
+    --sidebar-soft:#2a2620;
+    --shadow:0 1px 2px rgba(40,33,20,.04),0 8px 24px rgba(40,33,20,.05);
+    --serif:"Songti SC","STSong","宋体","Source Han Serif SC",serif;
+    --sans:"PingFang SC","SF Pro Text",-apple-system,"Helvetica Neue",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--ink);font-family:var(--sans);
+    font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;
+    display:flex;
+  }
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:#ddd6c8;border-radius:6px;border:2px solid var(--bg)}
+
+  /* ── SIDEBAR ── */
+  .sidebar{
+    width:248px;flex-shrink:0;height:100vh;position:sticky;top:0;
+    background:var(--sidebar);color:#d8d2c4;
+    display:flex;flex-direction:column;padding:24px 0;
+  }
+  .brand{padding:0 24px 22px;border-bottom:1px solid rgba(255,255,255,.07);margin-bottom:18px}
+  .brand .logo{
+    font-family:var(--serif);font-size:21px;color:#f3ead5;letter-spacing:1px;
+    display:flex;align-items:center;gap:9px;
+  }
+  .brand .logo .mark{
+    width:30px;height:30px;border:1.5px solid var(--gold);border-radius:7px;
+    display:grid;place-items:center;font-size:15px;color:var(--gold);
+  }
+  .brand .sub{font-size:11px;color:#8a8270;letter-spacing:3px;margin-top:7px;text-transform:uppercase}
+
+  .nav-label{font-size:10px;letter-spacing:2px;color:#6f6a5c;padding:0 24px;margin:6px 0 8px;text-transform:uppercase}
+  .nav{flex:1;overflow-y:auto;padding-bottom:10px}
+  .nav::-webkit-scrollbar{width:0}
+  .nav a{
+    display:flex;align-items:center;gap:11px;padding:9px 24px;
+    color:#cbc4b4;text-decoration:none;font-size:13.5px;position:relative;
+    transition:background .15s,color .15s;
+  }
+  .nav a .ico{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+  .nav a .tx{flex:1}
+  .nav a .tx small{display:block;font-size:10.5px;color:#7d7766;margin-top:1px}
+  .nav a:hover{background:var(--sidebar-soft);color:#f3ead5}
+  .nav a.home{color:#f3ead5}
+  .nav a.home.active::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;background:var(--gold);border-radius:0 3px 3px 0}
+  .nav a .ext{font-size:10px;color:#6f6a5c;opacity:0}
+  .nav a:hover .ext{opacity:1}
+  .nav .divider{height:1px;background:rgba(255,255,255,.07);margin:14px 24px}
+
+  .side-foot{padding:16px 24px 0;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:#7d7766}
+
+  /* ── MAIN ── */
+  .main{flex:1;min-width:0;padding:30px 44px 60px;max-width:1180px}
+
+  .topbar{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:30px;flex-wrap:wrap;gap:18px}
+  .hello h1{font-family:var(--serif);font-size:30px;font-weight:500;letter-spacing:.5px}
+  .hello .date{color:var(--muted);font-size:13px;margin-top:5px;letter-spacing:.5px}
+  .hello .date b{color:var(--ink-soft);font-weight:500}
+  .clock{font-variant-numeric:tabular-nums;color:var(--gold);font-weight:600}
+
+  .countdown{
+    display:flex;gap:0;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;overflow:hidden;box-shadow:var(--shadow)
+  }
+  .cd-cell{padding:11px 20px;text-align:center;border-right:1px solid var(--line)}
+  .cd-cell:last-child{border-right:none}
+  .cd-cell .n{font-family:var(--serif);font-size:24px;color:var(--ink);line-height:1;font-variant-numeric:tabular-nums}
+  .cd-cell .l{font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:5px}
+  .cd-cell.accent .n{color:var(--gold)}
+
+  /* mission strip */
+  .mission{
+    background:linear-gradient(105deg,#23201a,#322c22);color:#ece3cf;
+    border-radius:14px;padding:20px 26px;margin-bottom:26px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow)
+  }
+  .mission::after{content:"❝";position:absolute;right:22px;top:0px;font-size:90px;color:rgba(184,146,79,.16);font-family:var(--serif)}
+  .mission .tag{font-size:10px;letter-spacing:3px;color:var(--gold-soft);text-transform:uppercase;margin-bottom:8px}
+  .mission p{font-family:var(--serif);font-size:16.5px;line-height:1.75;max-width:760px}
+
+  /* grid */
+  .grid{display:grid;gap:18px}
+  .g2{grid-template-columns:1.15fr .85fr}
+  @media(max-width:980px){.g2{grid-template-columns:1fr}}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow)}
+  .panel-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .panel-h .t{font-family:var(--serif);font-size:17px;display:flex;align-items:center;gap:9px}
+  .panel-h .t .dot{width:7px;height:7px;border-radius:50%;background:var(--gold)}
+  .panel-h .hint{font-size:11px;color:var(--muted)}
+
+  /* priorities */
+  .star{display:flex;align-items:flex-start;gap:13px;padding:12px 0;border-bottom:1px dashed var(--line)}
+  .star:last-child{border-bottom:none}
+  .star .idx{
+    width:26px;height:26px;flex-shrink:0;border-radius:8px;background:#f3ecdc;color:var(--gold);
+    font-family:var(--serif);font-size:15px;display:grid;place-items:center;margin-top:2px
+  }
+  .star.done .idx{background:var(--gold);color:#fff}
+  .star input.txt{
+    flex:1;border:none;background:transparent;font-family:var(--sans);font-size:14.5px;color:var(--ink);
+    padding:4px 0;outline:none;border-bottom:1px solid transparent
+  }
+  .star input.txt:focus{border-bottom-color:var(--gold-soft)}
+  .star.done input.txt{text-decoration:line-through;color:var(--muted)}
+  .star .chk{
+    width:21px;height:21px;flex-shrink:0;border:1.5px solid var(--line);border-radius:7px;cursor:pointer;
+    margin-top:5px;display:grid;place-items:center;color:#fff;font-size:12px;transition:.15s
+  }
+  .star.done .chk{background:var(--teal);border-color:var(--teal)}
+  .star .cap{
+    flex-shrink:0;margin-top:4px;font-size:11px;color:var(--muted);border:1px solid var(--line);
+    border-radius:20px;padding:3px 10px;background:#fbf8f1;cursor:pointer;white-space:nowrap
+  }
+
+  /* ritual */
+  .ritual li{list-style:none;display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+  .ritual li:last-child{border-bottom:none}
+  .ritual .box{width:20px;height:20px;border:1.5px solid var(--line);border-radius:6px;display:grid;place-items:center;color:#fff;font-size:12px;flex-shrink:0;transition:.15s}
+  .ritual li.on .box{background:var(--gold);border-color:var(--gold)}
+  .ritual li.on .lab{color:var(--muted);text-decoration:line-through}
+  .ritual .lab{font-size:14px}
+  .ritual .lab small{display:block;font-size:11px;color:var(--muted);margin-top:1px}
+  .ritual-bar{height:5px;background:#efe8d9;border-radius:4px;margin-top:14px;overflow:hidden}
+  .ritual-bar i{display:block;height:100%;background:var(--gold);width:0;transition:width .35s}
+
+  /* capitals */
+  .caps{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:2px}
+  @media(max-width:560px){.caps{grid-template-columns:repeat(2,1fr)}}
+  .cap-card{border:1px solid var(--line);border-radius:11px;padding:13px 14px;background:#fdfbf6;transition:.15s}
+  .cap-card:hover{border-color:var(--gold-soft);background:#fffdf8}
+  .cap-card .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px}
+  .cap-card .nm{font-family:var(--serif);font-size:15px}
+  .cap-card .sub{font-size:10px;color:var(--muted);letter-spacing:.5px}
+  .cap-card .score{font-family:var(--serif);font-size:13px;color:var(--gold)}
+  .dots{display:flex;gap:5px}
+  .dots .d{flex:1;height:7px;border-radius:4px;background:#ece5d6;cursor:pointer;transition:.12s}
+  .dots .d.on{background:var(--gold)}
+  .dots .d:hover{transform:scaleY(1.5)}
+
+  /* phase timeline */
+  .phases{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:2px}
+  .ph{padding:15px 16px;border-right:1px solid var(--line);background:#fdfbf6}
+  .ph:last-child{border-right:none}
+  .ph.now{background:linear-gradient(160deg,#fbf3e2,#f6ead0)}
+  .ph .yr{font-size:11px;color:var(--gold);letter-spacing:1px;font-weight:600}
+  .ph .ti{font-family:var(--serif);font-size:15px;margin:5px 0 3px}
+  .ph .de{font-size:11.5px;color:var(--muted);line-height:1.5}
+  .ph.now .badge{display:inline-block;font-size:9px;background:var(--gold);color:#fff;padding:2px 7px;border-radius:10px;letter-spacing:1px;margin-top:7px}
+
+  /* launch grid */
+  .launch{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:880px){.launch{grid-template-columns:repeat(2,1fr)}}
+  .lc{
+    display:flex;flex-direction:column;gap:7px;text-decoration:none;color:var(--ink);
+    border:1px solid var(--line);border-radius:12px;padding:15px 16px;background:#fdfbf6;transition:.15s
+  }
+  .lc:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--shadow);background:#fffdf8}
+  .lc .ic{font-size:22px}
+  .lc .nm{font-family:var(--serif);font-size:15px}
+  .lc .de{font-size:11px;color:var(--muted)}
+
+  .sect-title{font-family:var(--serif);font-size:15px;color:var(--ink-soft);margin:30px 0 14px;display:flex;align-items:center;gap:10px}
+  .sect-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  .saved-tip{position:fixed;bottom:22px;right:26px;background:var(--ink);color:#f3ead5;font-size:12px;padding:9px 16px;border-radius:20px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:50}
+  .saved-tip.show{opacity:1;transform:translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ───────── SIDEBAR ───────── -->
+<aside class="sidebar">
+  <div class="brand">
+    <div class="logo"><span class="mark">✦</span> 个人系统 OS</div>
+    <div class="sub">Treasure Map · 王予晟</div>
+  </div>
+
+  <nav class="nav">
+    <a href="#" class="home active"><span class="ico">🧭</span><span class="tx">今日控制台<small>晨间规划 · 系统校准</small></span></a>
+    <div class="divider"></div>
+    <div class="nav-label">寻宝系统 · 七大知识库</div>
+
+    <a href="https://my.feishu.cn/wiki/W8bUwtfz1iXm40kJMo3cALyXnhd" target="_blank"><span class="ico">📜</span><span class="tx">【传说】使命<small>为什么出发</small></span><span class="ext">↗</span></a>
+    <a href="https://my.feishu.cn/wiki/PboUwF8nfiOE4YkIFzfcn65tnSg" target="_blank"><span class="ico">🎯</span><span class="tx">【标记】目标<small>走到哪里停下</small></span><span class="ext">↗</span></a>
+    <a href="https://my.feishu.cn/wiki/UaN1wxCb2ilBAKktVw6cxKWbnWg" target="_blank"><span class="ico">🧭</span><span class="tx">【导师】指引<small>谁来指路</small></span><span class="ext">↗</span></a>
+    <a href="https://my.feishu.cn/wiki/TVHJw3Ap9iF0UckOXfgcaRYanTe" target="_blank"><span class="ico">⚔️</span><span class="tx">【探险家】能力<small>九大资本</small></span><span class="ext">↗</span></a>
+    <a href="https://my.feishu.cn/wiki/DqWqw1ga5i4pvEkThVqc7hNpnsd" target="_blank"><span class="ico">🗺️</span><span class="tx">【藏宝图】路线规划<small>十五年 / 五年</small></span><span class="ext">↗</span></a>
+    <a href="https://my.feishu.cn/wiki/Y8giw7XcXictGJkpiPCcrjdNnCc" target="_blank"><span class="ico">👣</span><span class="tx">【足印】执行计划<small>行动指南</small></span><span class="ext">↗</span></a>
+    <a href="https://my.feishu.cn/wiki/VmKjwrm8QiIky1kIU89cDOdmn3g" target="_blank"><span class="ico">🦾</span><span class="tx">【外骨骼】工具<small>工具箱 / 藏书馆</small></span><span class="ext">↗</span></a>
+  </nav>
+
+  <div class="side-foot">
+    <div id="phaseFoot">— 当前阶段 —</div>
+  </div>
+</aside>
+
+<!-- ───────── MAIN ───────── -->
+<main class="main">
+
+  <div class="topbar">
+    <div class="hello">
+      <h1 id="greet">早安，予晟</h1>
+      <div class="date" id="dateLine">加载中…</div>
+    </div>
+    <div class="countdown" id="countdown"></div>
+  </div>
+
+  <!-- 使命提醒 -->
+  <div class="mission">
+    <div class="tag">为什么出发 · The Legend</div>
+    <p id="missionText">你不是漫无目的地游荡。你出发，是因为听到了一个传说——有人在某处埋了一笔宝藏，找到它的人，可以不再为生存发愁，把全部时间花在自己真正想做的事情上。</p>
+  </div>
+
+  <!-- 今日北极星 + 晨间仪式 -->
+  <div class="grid g2">
+    <div class="panel">
+      <div class="panel-h">
+        <div class="t"><span class="dot"></span>今日北极星</div>
+        <div class="hint">最多 3 件 · 直接推动商业结果的事</div>
+      </div>
+      <div id="stars"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-h">
+        <div class="t"><span class="dot"></span>晨间仪式</div>
+        <div class="hint" id="ritualPct">0 / 6</div>
+      </div>
+      <ul class="ritual" id="ritual"></ul>
+      <div class="ritual-bar"><i id="ritualFill"></i></div>
+    </div>
+  </div>
+
+  <!-- 九大资本 -->
+  <div class="sect-title">⚔️ 九大资本 · 今日系统校准</div>
+  <div class="panel">
+    <div class="panel-h">
+      <div class="t"><span class="dot"></span>探险家能力盘</div>
+      <div class="hint">点击格子记录当前投入 / 状态（0–5）· 自动保存</div>
+    </div>
+    <div class="caps" id="caps"></div>
+  </div>
+
+  <!-- 人生阶段 -->
+  <div class="sect-title">🧭 寻宝航程 · 阶段定位</div>
+  <div class="phases" id="phases"></div>
+
+  <!-- 知识库入口 -->
+  <div class="sect-title">📂 知识库直达入口</div>
+  <div class="launch" id="launch"></div>
+
+</main>
+
+<div class="saved-tip" id="savedTip">已保存 ✓</div>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s);
+const todayKey=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const load=(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch(e){return f}};
+const save=(k,v)=>{localStorage.setItem(k,JSON.stringify(v));tip()};
+let tipT;function tip(){const t=$('#savedTip');t.classList.add('show');clearTimeout(tipT);tipT=setTimeout(()=>t.classList.remove('show'),1100)}
+
+/* ── 数据定义 ── */
+const CAPITALS=[
+  ['体魄','生理资本'],['信念','心理资本'],['技艺','人力资本'],
+  ['直觉','认知资本'],['功勋','履历资本'],['声名','品牌资本'],
+  ['同行','关系资本'],['通途','文化资本'],['盘缠','财务资本']
+];
+const RITUAL=[
+  ['重温使命','我为什么出发'],
+  ['确认终点','今天向 X 靠近一步'],
+  ['设定今日北极星','锁定 3 件关键事'],
+  ['校准九大资本','今天重点投入哪几项'],
+  ['检视昨日足迹','复盘 + 修正'],
+  ['进入深度工作','开始第一个心流块']
+];
+const KB=[
+  ['📜','【传说】使命','为什么出发','W8bUwtfz1iXm40kJMo3cALyXnhd'],
+  ['🎯','【标记】目标','35岁原景 · 终点','PboUwF8nfiOE4YkIFzfcn65tnSg'],
+  ['🧭','【导师】指引','学习清单 · 信息源','UaN1wxCb2ilBAKktVw6cxKWbnWg'],
+  ['⚔️','【探险家】能力','九大资本','TVHJw3Ap9iF0UckOXfgcaRYanTe'],
+  ['🗺️','【藏宝图】路线规划','十五年 / 五年计划','DqWqw1ga5i4pvEkThVqc7hNpnsd'],
+  ['👣','【足印】执行计划','行动指南','Y8giw7XcXictGJkpiPCcrjdNnCc'],
+  ['🦾','【外骨骼】工具','工具箱 · 剪辑 · 藏书馆','VmKjwrm8QiIky1kIU89cDOdmn3g']
+];
+const PHASES=[
+  ['2026–2031','25 → 30 · 积累期','打工深耕，攒商业认知与 1–2 百万原始资本',2026,2031],
+  ['2031–2036','30 → 35 · 冲刺期','联合创业，小步试错，现金流优先',2031,2036],
+  ['2036 +','35 → · 自由期','被动收入为主，全球可移动办公，只做决策',2036,2046]
+];
+const TARGET=new Date('2036-12-31T00:00:00');
+const JOURNEY_START=new Date('2026-01-01T00:00:00');
+
+/* ── 顶部时间 + 问候 ── */
+function tickTop(){
+  const now=new Date();
+  const wd=['日','一','二','三','四','五','六'][now.getDay()];
+  const hh=String(now.getHours()).padStart(2,'0');
+  const mm=String(now.getMinutes()).padStart(2,'0');
+  const ss=String(now.getSeconds()).padStart(2,'0');
+  $('#dateLine').innerHTML=`<b>${now.getFullYear()} 年 ${now.getMonth()+1} 月 ${now.getDate()} 日</b> · 星期${wd} · <span class="clock">${hh}:${mm}:${ss}</span>`;
+  const h=now.getHours();
+  let g='早安';if(h>=11&&h<14)g='午安';else if(h>=14&&h<18)g='下午好';else if(h>=18||h<5)g='晚上好';
+  $('#greet').textContent=g+'，予晟';
+}
+function renderCountdown(){
+  const now=new Date();
+  const daysLeft=Math.ceil((TARGET-now)/864e5);
+  const total=(TARGET-JOURNEY_START)/864e5;
+  const passed=(now-JOURNEY_START)/864e5;
+  const pct=Math.max(0,Math.min(100,Math.round(passed/total*100)));
+  const yrsLeft=(daysLeft/365).toFixed(1);
+  $('#countdown').innerHTML=`
+    <div class="cd-cell accent"><div class="n">${daysLeft.toLocaleString()}</div><div class="l">距 35 岁还有 / 天</div></div>
+    <div class="cd-cell"><div class="n">${yrsLeft}</div><div class="l">年 · 至 3000 万</div></div>
+    <div class="cd-cell"><div class="n">${pct}%</div><div class="l">航程已走过</div></div>`;
+}
+
+/* ── 北极星 ── */
+function renderStars(){
+  const k='plan_'+todayKey();
+  const data=load(k,{stars:[{t:'',d:false,c:''},{t:'',d:false,c:''},{t:'',d:false,c:''}],ritual:[]});
+  const box=$('#stars');box.innerHTML='';
+  data.stars.forEach((s,i)=>{
+    const row=document.createElement('div');
+    row.className='star'+(s.d?' done':'');
+    row.innerHTML=`
+      <div class="idx">${i+1}</div>
+      <div class="chk">${s.d?'✓':''}</div>
+      <input class="txt" placeholder="第 ${i+1} 件关键事…" value="${(s.t||'').replace(/"/g,'&quot;')}">
+      <div class="cap" title="点击切换它建设的资本">${s.c||'＋资本'}</div>`;
+    row.querySelector('.chk').onclick=()=>{s.d=!s.d;save(k,data);renderStars()};
+    row.querySelector('.txt').oninput=e=>{s.t=e.target.value;localStorage.setItem(k,JSON.stringify(data))};
+    row.querySelector('.txt').onblur=()=>tip();
+    row.querySelector('.cap').onclick=()=>{
+      const names=CAPITALS.map(c=>c[0]);
+      let idx=names.indexOf((s.c||'').replace('· ',''));
+      idx=(idx+1)%(names.length+1);
+      s.c=idx===names.length?'':'· '+names[idx];
+      save(k,data);renderStars();
+    };
+    box.appendChild(row);
+  });
+}
+
+/* ── 晨间仪式 ── */
+function renderRitual(){
+  const k='plan_'+todayKey();
+  const data=load(k,{stars:[],ritual:[]});
+  if(!data.ritual||data.ritual.length!==RITUAL.length)data.ritual=RITUAL.map(()=>false);
+  const ul=$('#ritual');ul.innerHTML='';
+  RITUAL.forEach((r,i)=>{
+    const li=document.createElement('li');
+    li.className=data.ritual[i]?'on':'';
+    li.innerHTML=`<div class="box">${data.ritual[i]?'✓':''}</div><div class="lab">${r[0]}<small>${r[1]}</small></div>`;
+    li.onclick=()=>{data.ritual[i]=!data.ritual[i];save(k,data);renderRitual()};
+    ul.appendChild(li);
+  });
+  const done=data.ritual.filter(Boolean).length;
+  $('#ritualPct').textContent=done+' / '+RITUAL.length;
+  $('#ritualFill').style.width=(done/RITUAL.length*100)+'%';
+}
+
+/* ── 九大资本 ── */
+function renderCaps(){
+  const k='caps_'+todayKey();
+  const data=load(k,CAPITALS.map(()=>0));
+  const box=$('#caps');box.innerHTML='';
+  CAPITALS.forEach((c,i)=>{
+    const card=document.createElement('div');card.className='cap-card';
+    let dots='';for(let j=1;j<=5;j++)dots+=`<div class="d ${j<=data[i]?'on':''}" data-v="${j}"></div>`;
+    card.innerHTML=`<div class="hd"><div><div class="nm">「${c[0]}」</div><div class="sub">${c[1]}</div></div><div class="score">${data[i]}/5</div></div><div class="dots">${dots}</div>`;
+    card.querySelectorAll('.d').forEach(d=>{
+      d.onclick=()=>{const v=+d.dataset.v;data[i]=(data[i]===v)?v-1:v;save(k,data);renderCaps()};
+    });
+    box.appendChild(card);
+  });
+}
+
+/* ── 阶段 ── */
+function renderPhases(){
+  const yr=new Date().getFullYear();
+  const box=$('#phases');box.innerHTML='';
+  let cur='';
+  PHASES.forEach(p=>{
+    const now=yr>=p[3]&&yr<p[4];
+    if(now)cur=p[1];
+    box.innerHTML+=`<div class="ph ${now?'now':''}"><div class="yr">${p[0]}</div><div class="ti">${p[1]}</div><div class="de">${p[2]}</div>${now?'<span class="badge">当前阶段</span>':''}</div>`;
+  });
+  $('#phaseFoot').innerHTML=`📍 当前 · ${cur||'积累期'}`;
+}
+
+/* ── 入口 ── */
+function renderLaunch(){
+  const box=$('#launch');box.innerHTML='';
+  KB.forEach(([ic,nm,de,tok])=>{
+    box.innerHTML+=`<a class="lc" href="https://my.feishu.cn/wiki/${tok}" target="_blank"><div class="ic">${ic}</div><div class="nm">${nm}</div><div class="de">${de} ↗</div></a>`;
+  });
+}
+
+/* ── init ── */
+tickTop();setInterval(tickTop,1000);
+renderCountdown();setInterval(renderCountdown,3600000);
+renderStars();renderRitual();renderCaps();renderPhases();renderLaunch();
+</script>
+</body>
+</html>
