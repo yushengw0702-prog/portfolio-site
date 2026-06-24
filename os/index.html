@@ -191,7 +191,8 @@
   .feed-group>summary::-webkit-details-marker{display:none}
   .feed-group>summary .tag{font-size:12.5px;background:#f0e7d3;color:var(--gold);border-radius:20px;padding:3px 12px;font-family:var(--serif);text-decoration:none;transition:.15s}
   .feed-group>summary .tag:hover{background:var(--gold);color:#fff}
-  .feed-group>summary .arr{margin-left:auto;color:var(--muted);font-size:11px;transition:.2s}
+  .feed-group>summary .cnt{margin-left:auto;font-size:11px;color:var(--muted);background:#f0ece2;border-radius:10px;padding:1px 8px;min-width:20px;text-align:center}
+  .feed-group>summary .arr{margin-left:10px;color:var(--muted);font-size:11px;transition:.2s}
   .feed-group[open]>summary .arr{transform:rotate(90deg)}
   .feed-kids{padding:0 14px 11px}
   .feed-link{display:block;text-decoration:none;color:var(--ink-soft);font-size:13px;padding:5px 0 5px 13px;border-left:1px solid var(--line);transition:.12s}
@@ -451,32 +452,27 @@ function renderLaunch(){
   });
 }
 
-/* ── 工作区收录 feed ── */
-function feedNode(n){
-  const has=n.title&&n.title.trim();
-  const title=has?n.title:'· 无标题文档';
-  const cls=has?'':' untitled';
-  if(n.children&&n.children.length){
-    return `<a class="feed-tag2${cls}" href="${n.url}" target="_blank">▸ ${title}</a>`
-         +`<div class="feed-sub">${n.children.map(feedNode).join('')}</div>`;
-  }
-  return `<a class="feed-link${cls}" href="${n.url}" target="_blank">${title}</a>`;
-}
+/* ── 工作区收录 feed（标题=小标签，下面=内联引用文档）── */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function renderFeed(){
   const box=$('#feedBox'),btn=$('#feedRefresh');
   if(btn)btn.classList.add('spin');
   fetch('feed.json?_='+Date.now()).then(r=>r.json()).then(f=>{
-    $('#feedMeta').textContent='同步于 '+(f.generated_at||'').slice(0,16).replace('T',' ');
-    if(!f.items||!f.items.length){box.innerHTML='<div class="feed-empty">工作区暂无子文档</div>';return}
-    box.innerHTML=f.items.map((it,i)=>{
-      const has=it.title&&it.title.trim();
-      const title=has?it.title:'· 无标题';
-      const kids=(it.children&&it.children.length)
-        ? it.children.map(feedNode).join('')
-        : '<div class="feed-empty">（暂无子文档）</div>';
-      return `<details class="feed-group" ${i===0?'open':''}>`
-           +`<summary><a class="tag" href="${it.url}" target="_blank" onclick="event.stopPropagation()">${title}</a><span class="arr">▸</span></summary>`
-           +`<div class="feed-kids">${kids}</div></details>`;
+    const src=f.source&&f.source.url?` · <a href="${f.source.url}" target="_blank" style="color:var(--gold);text-decoration:none">打开源文档 ↗</a>`:'';
+    $('#feedMeta').innerHTML='同步于 '+(f.generated_at||'').slice(0,16).replace('T',' ')+src;
+    const groups=f.groups||[];
+    if(!groups.length){box.innerHTML='<div class="feed-empty">工作区暂无内容</div>';return}
+    box.innerHTML=groups.map((g,i)=>{
+      const docs=(g.docs&&g.docs.length)
+        ? g.docs.map(d=>{
+            const has=d.title&&d.title.trim()&&d.title!=='无标题文档';
+            return `<a class="feed-link${has?'':' untitled'}" href="${d.url}" target="_blank">${esc(d.title)}</a>`;
+          }).join('')
+        : '<div class="feed-empty">（该分类暂无文档）</div>';
+      return `<details class="feed-group" ${i<2?'open':''}>`
+           +`<summary><span class="tag">${esc(g.heading)}</span>`
+           +`<span class="cnt">${(g.docs||[]).length}</span><span class="arr">▸</span></summary>`
+           +`<div class="feed-kids">${docs}</div></details>`;
     }).join('');
   }).catch(()=>{
     box.innerHTML='<div class="feed-empty">暂无同步数据 —— 运行 update-feed 脚本后显示</div>';
