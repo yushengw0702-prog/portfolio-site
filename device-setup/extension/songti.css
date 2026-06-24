@@ -1,0 +1,65 @@
+/* ── 宋体 ── */
+* {
+  font-family: "Songti SC", "STSong", "宋体", "SimSun", "Source Han Serif SC",
+               serif !important;
+}
+
+/* 代码块保留等宽字体 */
+code, pre, kbd, samp,
+[class*="code"], [class*="Code"],
+.lark-editor-codeblock,
+.code-block {
+  font-family: "SF Mono", "Menlo", "Monaco", "Consolas",
+               "Courier New", monospace !important;
+}
+
+/* ── 米白背景（Claude 聊天同款）── */
+/*
+ * 通过覆盖飞书的设计变量统一改色，避免逐个元素命中造成的色块/条带。
+ * 所有中性背景档位都设成同一族米白，只留极小差异，确保无斑块。
+ */
+
+:root,
+:root[data-theme],
+:root[theme-mode],
+body,
+.semi-always-light,
+.semi-light-scrollbar {
+  /* Semi Design 中性背景档位（飞书底层 UI 库） */
+  --semi-color-bg-0: #faf9f5 !important;
+  --semi-color-bg-1: #faf9f5 !important;
+  --semi-color-bg-2: #f6f4ee !important;
+  --semi-color-bg-3: #f2efe8 !important;
+  --semi-color-bg-4: #efebe2 !important;
+  --semi-color-fill-0: #f2efe8 !important;
+  --semi-color-fill-1: #efebe2 !important;
+
+  /* Lark / 飞书 UDS 背景 token */
+  --bg-body: #faf9f5 !important;
+  --bg-body-overlay: #faf9f5 !important;
+  --bg-content: #faf9f5 !important;
+  --bg-content-base: #faf9f5 !important;
+  --bg-base: #faf9f5 !important;
+  --bg-sidebar: #f6f4ee !important;
+  --bg-pri-default: #faf9f5 !important;
+  --bg-pri-hover: #f2efe8 !important;
+  --bg-float: #fffdf8 !important;
+  --bg-float-base: #fffdf8 !important;
+  --bg-float-overlay: #fffdf8 !important;
+  --N00: #faf9f5 !important;
+  --N50: #f6f4ee !important;
+  --N100: #f2efe8 !important;
+}
+
+/* ── 图片圆角 ── */
+img {
+  border-radius: 8px !important;
+}
+
+/* 兜底：根容器与滚动区，防止 token 未覆盖处露出纯白 */
+html, body,
+#root, #app,
+[class*="appLayout"], [class*="AppLayout"],
+[class*="workspace"], [class*="Workspace"] {
+  background-color: #faf9f5 !important;
+}
