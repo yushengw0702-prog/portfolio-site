@@ -180,6 +180,28 @@
   .lc .nm{font-family:var(--serif);font-size:15px}
   .lc .de{font-size:11px;color:var(--muted)}
 
+  /* feed module（工作区收录，克制低调） */
+  .feed-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .feed-meta{font-size:11px;color:var(--muted);letter-spacing:.3px}
+  .feed-refresh{font-size:11.5px;color:var(--ink-soft);background:#f3ecdc;border:1px solid var(--line);border-radius:18px;padding:5px 13px;cursor:pointer;transition:.15s}
+  .feed-refresh:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .feed-refresh.spin{opacity:.55;pointer-events:none}
+  .feed-group{border:1px solid var(--line);border-radius:11px;background:#fdfbf6;margin-bottom:9px;overflow:hidden}
+  .feed-group>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px 14px}
+  .feed-group>summary::-webkit-details-marker{display:none}
+  .feed-group>summary .tag{font-size:12.5px;background:#f0e7d3;color:var(--gold);border-radius:20px;padding:3px 12px;font-family:var(--serif);text-decoration:none;transition:.15s}
+  .feed-group>summary .tag:hover{background:var(--gold);color:#fff}
+  .feed-group>summary .arr{margin-left:auto;color:var(--muted);font-size:11px;transition:.2s}
+  .feed-group[open]>summary .arr{transform:rotate(90deg)}
+  .feed-kids{padding:0 14px 11px}
+  .feed-link{display:block;text-decoration:none;color:var(--ink-soft);font-size:13px;padding:5px 0 5px 13px;border-left:1px solid var(--line);transition:.12s}
+  .feed-link:hover{color:var(--gold);border-left-color:var(--gold)}
+  .feed-tag2{display:block;text-decoration:none;font-family:var(--serif);font-size:12.5px;color:var(--ink-soft);padding:6px 0 3px 13px;border-left:1px solid var(--line);transition:.12s}
+  .feed-tag2:hover{color:var(--gold);border-left-color:var(--gold)}
+  .feed-sub{margin-left:13px}
+  .feed-link.untitled,.feed-tag2.untitled{color:var(--muted);font-style:italic}
+  .feed-empty{font-size:12.5px;color:var(--muted);padding:13px;text-align:center}
+
   .sect-title{font-family:var(--serif);font-size:15px;color:var(--ink-soft);margin:30px 0 14px;display:flex;align-items:center;gap:10px}
   .sect-title::after{content:"";flex:1;height:1px;background:var(--line)}
 
@@ -265,6 +287,16 @@
   <!-- 人生阶段 -->
   <div class="sect-title">🧭 寻宝航程 · 阶段定位</div>
   <div class="phases" id="phases"></div>
+
+  <!-- 工作区收录 -->
+  <div class="sect-title">📥 工作区 · 最近收录</div>
+  <div class="panel">
+    <div class="feed-head">
+      <div class="feed-meta" id="feedMeta">读取中…</div>
+      <button class="feed-refresh" id="feedRefresh" onclick="renderFeed()">↻ 刷新</button>
+    </div>
+    <div id="feedBox"></div>
+  </div>
 
   <!-- 知识库入口 -->
   <div class="sect-title">📂 知识库直达入口</div>
@@ -419,10 +451,43 @@ function renderLaunch(){
   });
 }
 
+/* ── 工作区收录 feed ── */
+function feedNode(n){
+  const has=n.title&&n.title.trim();
+  const title=has?n.title:'· 无标题文档';
+  const cls=has?'':' untitled';
+  if(n.children&&n.children.length){
+    return `<a class="feed-tag2${cls}" href="${n.url}" target="_blank">▸ ${title}</a>`
+         +`<div class="feed-sub">${n.children.map(feedNode).join('')}</div>`;
+  }
+  return `<a class="feed-link${cls}" href="${n.url}" target="_blank">${title}</a>`;
+}
+function renderFeed(){
+  const box=$('#feedBox'),btn=$('#feedRefresh');
+  if(btn)btn.classList.add('spin');
+  fetch('feed.json?_='+Date.now()).then(r=>r.json()).then(f=>{
+    $('#feedMeta').textContent='同步于 '+(f.generated_at||'').slice(0,16).replace('T',' ');
+    if(!f.items||!f.items.length){box.innerHTML='<div class="feed-empty">工作区暂无子文档</div>';return}
+    box.innerHTML=f.items.map((it,i)=>{
+      const has=it.title&&it.title.trim();
+      const title=has?it.title:'· 无标题';
+      const kids=(it.children&&it.children.length)
+        ? it.children.map(feedNode).join('')
+        : '<div class="feed-empty">（暂无子文档）</div>';
+      return `<details class="feed-group" ${i===0?'open':''}>`
+           +`<summary><a class="tag" href="${it.url}" target="_blank" onclick="event.stopPropagation()">${title}</a><span class="arr">▸</span></summary>`
+           +`<div class="feed-kids">${kids}</div></details>`;
+    }).join('');
+  }).catch(()=>{
+    box.innerHTML='<div class="feed-empty">暂无同步数据 —— 运行 update-feed 脚本后显示</div>';
+    $('#feedMeta').textContent='';
+  }).finally(()=>{if(btn)btn.classList.remove('spin')});
+}
+
 /* ── init ── */
 tickTop();setInterval(tickTop,1000);
 renderCountdown();setInterval(renderCountdown,3600000);
-renderStars();renderRitual();renderCaps();renderPhases();renderLaunch();
+renderStars();renderRitual();renderCaps();renderPhases();renderLaunch();renderFeed();
 </script>
 </body>
 </html>
