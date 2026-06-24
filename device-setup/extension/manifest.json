@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "飞书宋体",
+  "version": "2.0",
+  "description": "让浏览器版飞书使用宋体字体，支持自定义字体和背景颜色",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwNI6p7FU0vjZ0GOuAjHRwFJosJkhth3oQBDWTfcca9k5WgZxwpNzgFb887eZja/JmV2ddH8pU4Psgp8oe4WTPvaZaMbAnlGfiOziYJx+PAz0H9VA3xTBjWcMv/Qa6Mqz7czHpeR7sjDejKgHTghzkYnZcmXwbbxWOTzu/DaCx/qS/2rBwB8lK8tfGANywCrfZLl6zjLw/HsPL4SPTv/8fOhfGx7cr24R9e3m0HB1cjoGfKPVamqd/hy2G069rtUBZei6s2tffSNNDjfeWS4MHALcgVo0m5Xggk4DdSp33tVj4gqRA4CLwYwlpYlr6m9k+1YJNNd7nMdy4ai1Y0BffwIDAQAB",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "飞书宋体设置"
+  },
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.feishu.cn/*",
+        "*://*.larksuite.com/*"
+      ],
+      "css": ["songti.css"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
