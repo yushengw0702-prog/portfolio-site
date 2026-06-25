@@ -205,6 +205,19 @@
 
   .sect-title{font-family:var(--serif);font-size:15px;color:var(--ink-soft);margin:30px 0 14px;display:flex;align-items:center;gap:10px}
   .sect-title::after{content:"";flex:1;height:1px;background:var(--line)}
+  /* 核心原则 */
+  .principle{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:14px}
+  .principle .p-label{font-family:var(--serif);font-size:12px;color:var(--gold);letter-spacing:2px;margin-bottom:7px}
+  .principle .p-title{font-family:var(--serif);font-size:17px;color:var(--ink);font-weight:600;margin-bottom:12px;line-height:1.5}
+  .principle .p-body{font-size:13.5px;color:var(--ink-soft);line-height:1.9}
+  .weekstrip{display:flex;gap:6px;margin-bottom:14px}
+  .weekstrip .d{flex:1;text-align:center;padding:9px 0;border-radius:9px;font-family:var(--serif);font-size:14px;border:1px solid var(--line);transition:.15s}
+  .weekstrip .d .lbl{display:block;font-size:10px;margin-top:3px;letter-spacing:1px}
+  .weekstrip .d.exec{background:#f4f1ea;color:var(--ink-soft)}
+  .weekstrip .d.exec .lbl{color:var(--muted)}
+  .weekstrip .d.strat{background:#f6eed9;color:var(--gold);border-color:var(--gold-soft)}
+  .weekstrip .d.strat .lbl{color:var(--gold)}
+  .weekstrip .d.today{outline:2px solid var(--gold);outline-offset:1px;font-weight:700;box-shadow:0 2px 8px rgba(184,146,79,.18)}
 
   .saved-tip{position:fixed;bottom:22px;right:26px;background:var(--ink);color:#f3ead5;font-size:12px;padding:9px 16px;border-radius:20px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:50}
   .saved-tip.show{opacity:1;transform:translateY(0)}
@@ -254,6 +267,10 @@
     <div class="tag">为什么出发 · The Legend</div>
     <p id="missionText">你不是漫无目的地游荡。你出发，是因为听到了一个传说——有人在某处埋了一笔宝藏，找到它的人，可以不再为生存发愁，把全部时间花在自己真正想做的事情上。</p>
   </div>
+
+  <!-- 核心原则 -->
+  <div class="sect-title">⚖️ 核心原则 · 战略与执行的边界</div>
+  <div id="principles"></div>
 
   <!-- 今日北极星 + 晨间仪式 -->
   <div class="grid g2">
@@ -454,6 +471,34 @@ function renderLaunch(){
 
 /* ── 工作区收录 feed（标题=小标签，下面=内联引用文档）── */
 function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+/* ── 核心原则（数据驱动，加原则只需往数组里加一条）── */
+const PRINCIPLES = [
+  {
+    type:'time',
+    label:'原则 01',
+    title:'战略在周末定，执行在工作日',
+    body:'周六、周日用整块时间做战略规划、深度思考与复盘总结，把规则和这一周的执行清单一次性定好。周一到周五只按清单执行——不在碎片时间里碰战略性问题，否则很容易拖到深夜、影响睡眠，还误以为效率在推进。工作日若要思考，也只针对非战略性的具体问题做深度展开。'
+  }
+];
+function renderPrinciples(){
+  const box=$('#principles'); if(!box) return;
+  const today=new Date().getDay(); // 0 周日 … 6 周六
+  const days=[{n:'一',d:1},{n:'二',d:2},{n:'三',d:3},{n:'四',d:4},{n:'五',d:5},{n:'六',d:6},{n:'日',d:0}];
+  box.innerHTML=PRINCIPLES.map(p=>{
+    let strip='';
+    if(p.type==='time'){
+      strip='<div class="weekstrip">'+days.map(x=>{
+        const isWk=(x.d===0||x.d===6);
+        const cls=(isWk?'strat':'exec')+(x.d===today?' today':'');
+        return `<div class="d ${cls}">${x.n}<span class="lbl">${isWk?'战略':'执行'}</span></div>`;
+      }).join('')+'</div>';
+    }
+    return `<div class="principle"><div class="p-label">${esc(p.label)}</div>`
+         +`<div class="p-title">${esc(p.title)}</div>${strip}`
+         +`<div class="p-body">${esc(p.body)}</div></div>`;
+  }).join('');
+}
 // 把一份 feed 数据画到面板上
 function paintFeed(f){
   const box=$('#feedBox');
@@ -507,7 +552,7 @@ function syncFeed(){
 /* ── init ── */
 tickTop();setInterval(tickTop,1000);
 renderCountdown();setInterval(renderCountdown,3600000);
-renderStars();renderRitual();renderCaps();renderPhases();renderLaunch();renderFeed();
+renderPrinciples();renderStars();renderRitual();renderCaps();renderPhases();renderLaunch();renderFeed();
 </script>
 </body>
 </html>
