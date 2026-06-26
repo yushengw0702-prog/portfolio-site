@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "飞书宋体",
+  "version": "1.0",
+  "description": "让浏览器版飞书使用宋体字体",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.feishu.cn/*",
+        "*://*.larksuite.com/*"
+      ],
+      "css": ["songti.css"],
+      "run_at": "document_start"
+    }
+  ]
+}
