@@ -1,12 +1,10 @@
 {
-  "generated_at": "2026-06-26T23:00:06+08:00",
+  "generated_at": "2026-06-27T08:00:06",
   "source": {
-    "title": "工作区",
     "url": "https://my.feishu.cn/wiki/ELCQwN0p7ihY2qkrsOJcmC1knCZ"
   },
   "groups": [
     {
-      "level": 1,
       "heading": "营销基础",
       "docs": [
         {
@@ -16,7 +14,6 @@
       ]
     },
     {
-      "level": 1,
       "heading": "出海营销基础",
       "docs": [
         {
@@ -34,7 +31,6 @@
       ]
     },
     {
-      "level": 1,
       "heading": "思考",
       "docs": [
         {
@@ -44,7 +40,6 @@
       ]
     },
     {
-      "level": 1,
       "heading": "英语",
       "docs": [
         {
@@ -52,11 +47,6 @@
           "url": "https://my.feishu.cn/wiki/GFknwkhbiiUYXtkQpcMc1EYxnqV"
         }
       ]
-    },
-    {
-      "level": 1,
-      "heading": "（未命名标题）",
-      "docs": []
     }
   ]
 }
